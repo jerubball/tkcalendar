@@ -251,7 +251,6 @@ class DateEntry(ttk.Entry):
         x, y = event.x, event.y
         name = self.identify(x, y)
         if (('disabled' not in self.state()) and (name == self._downarrow_name or name == self._downarrow_name2)):
-            self.state(['pressed'])
             self.drop_down()
 
     def _on_focus_out_cal(self, event):
@@ -335,6 +334,7 @@ class DateEntry(ttk.Entry):
         """Display or withdraw the drop-down calendar depending on its current state."""
         if self._calendar.winfo_ismapped():
             self._top_cal.withdraw()
+            self.state(['!pressed'])
         else:
             self._validate_date()
             date = self.parse_date(self.get())
@@ -348,6 +348,8 @@ class DateEntry(ttk.Entry):
             self._top_cal.deiconify()
             self._calendar.focus_set()
             self._calendar.selection_set(date)
+            self.state(['pressed'])
+            self.after(10, self._calendar.focus_force)
 
     def state(self, *args):
         """
