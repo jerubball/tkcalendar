@@ -256,14 +256,21 @@ class DateEntry(ttk.Entry):
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
         if self.focus_get() is not None:
-            if self.focus_get() == self:
+            focus = self.focus_get()
+            if focus == self:
                 x, y = event.x, event.y
                 if (type(x) != int or type(y) != int or (self.identify(x, y) != self._downarrow_name and self.identify(x, y) != self.self._downarrow_name2)):
                     self._top_cal.withdraw()
                     self.state(['!pressed'])
             else:
-                self._top_cal.withdraw()
-                self.state(['!pressed'])
+                # do not withdraw if calendar element is focused
+                while focus is not None:
+                    if focus == self._calendar:
+                        break
+                    focus = focus.master
+                else:
+                    self._top_cal.withdraw()
+                    self.state(['!pressed'])
         elif self.grab_current():
             # 'active' won't be in state because of the grab
             x, y = self._top_cal.winfo_pointerxy()
